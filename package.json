@@ -1,0 +1,16 @@
+{
+  "name": "EventSense",
+  "version": "0.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Drew Cuthbertson (syeoryn@gmail.com)",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.3.0",
+    "express": "^4.4.0"
+  }
+}
