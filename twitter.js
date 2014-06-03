@@ -22,7 +22,7 @@ var thresholds = {
 stream.on('tweet', function(tweet){
   var newTweet = {
     time: tweet.created_at,
-    score: sentiment(tweet.text).score    
+    score: sentiment(tweet.text).score
   }
   // add new tweet to scores collection
   scores.tweetSentiments.push(newTweet);
@@ -33,10 +33,11 @@ stream.on('tweet', function(tweet){
     console.log('Positive tweet retweeted!');
   } else if(newTweet.score < thresholds.low){
     console.log('Negative tweet!');
+    postTweet('Hey @' + tweet.user.screen_name + '!  That wasn\'t very nice!')
   }
 
   console.log('\n\n\n\n\nTweet:', tweet.text);
-  console.log('Score:', tweet.score);
+  console.log('Score:', newTweet.score);
   console.log('Composite Score:', aggregateScore(scores.tweetSentiments));
 });
 
@@ -44,14 +45,22 @@ function retweet(tweet){
   T.post('statuses/retweet/' + tweet.id);
 }
 
+function postTweet(message){
+  T.post('statuses/update', {status: message}, function(err, data, res){
+    if(err) return console.error(err);
+    console.log('Tweet sent!', data);
+  })
+}
+
 var aggregateScore = function(collection, start, end){
-  // escape aggregateScore if collection is empty or
-  // start is in the future
-  if(!collection.length || start > new Date()) return 0;
   // start defaults to last midnight
   start = start || new Date((new Date()).setHours(0,0,0,0));
   // end defaults to current time
   end = end || new Date();
+
+  // escape aggregateScore if collection is empty or
+  // start is in the future
+  if(!collection.length || start > new Date()) return 0;
 
   var totalScore = 0;
   var numberOfTweets = 0;
