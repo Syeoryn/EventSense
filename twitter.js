@@ -11,18 +11,38 @@ var T = new Twitter({
 var stream = T.stream('user', {track: 'APIRXR'});
 
 var scores = {
-  tweetSentiments: [],
+  tweetSentiments: []
+}
+
+var thresholds = {
+  high: 1,
+  low: -1
 }
 
 stream.on('tweet', function(tweet){
-  scores.tweetSentiments.push({
+  var newTweet = {
     time: tweet.created_at,
-    score: sentiment(tweet.text).score
-  });
+    score: sentiment(tweet.text).score    
+  }
+  // add new tweet to scores collection
+  scores.tweetSentiments.push(newTweet);
+
+  // if tweet score exceeds thresholds, take action
+  if(newTweet.score > thresholds.high){
+    retweet(tweet);
+    console.log('Positive tweet retweeted!');
+  } else if(newTweet.score < thresholds.low){
+    console.log('Negative tweet!');
+  }
+
   console.log('\n\n\n\n\nTweet:', tweet.text);
   console.log('Score:', tweet.score);
+  console.log('Composite Score:', aggregateScore(scores.tweetSentiments));
 });
 
+function retweet(tweet){
+  T.post('statuses/retweet/' + tweet.id);
+}
 
 var aggregateScore = function(collection, start, end){
   // escape aggregateScore if collection is empty or
